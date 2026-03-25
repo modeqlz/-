@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>не даю упасть</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+
+    <!-- ═══ Nav ═══ -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <div class="nav-logo">
+                <img src="logo.png" alt="Logo" class="logo-img">
+                <span>не даю упасть</span>
+            </div>
+            <div class="nav-links">
+                <a href="#demo" class="nav-link">Демо</a>
+                <a href="#pricing" class="nav-link">Тарифы</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ═══ Telegram Mini App Profile ═══ -->
+    <div id="tg-profile-container" style="display: none;">
+        <div class="tg-profile">
+            <div class="tg-prof-left">
+                <img id="tg-prof-avatar" src="" alt="">
+                <div class="tg-prof-info">
+                    <div id="tg-prof-name" class="tg-name">Имя Фамилия</div>
+                    <div id="tg-prof-sub" class="tg-sub loading">Загрузка профиля...</div>
+                </div>
+            </div>
+            <div class="tg-prof-right">
+                <a href="#pricing" class="btn-main sm">Продлить</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Hero ═══ -->
+    <section class="hero">
+        <div class="hero-chip">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            v3.0 — Professional Edition
+        </div>
+        <h1 class="hero-h">Фарм кармы<br>на автопилоте</h1>
+        <p class="hero-p">Десктопный бот с ИИ-комментариями, 4-фазным прогревом и стелс-режимом для безопасного набора кармы</p>
+        <div class="hero-actions">
+            <a href="#pricing" class="btn-main">Оформить подписку</a>
+            <a href="#demo" class="btn-ghost">Смотреть демо</a>
+        </div>
+    </section>
+
+    <!-- ═══ Interactive App Demo ═══ -->
+    <section class="section" id="demo">
+        <div class="s-head">
+            <div class="s-chip">Интерактивное демо</div>
+            <h2 class="s-h">Попробуйте прямо здесь</h2>
+        </div>
+
+        <div class="app-demo">
+            <div class="app-titlebar">
+                <div class="app-dots">
+                    <span class="adot r"></span><span class="adot y"></span><span class="adot g"></span>
+                </div>
+                <div class="app-titlebar-text">не даю упасть</div>
+                <div style="width:48px"></div>
+            </div>
+            <div class="app-body">
+                <!-- Sidebar -->
+                <div class="app-sidebar">
+                    <div class="app-sidebar-nav">
+                        <div class="app-nav active" data-tab="dashboard">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>
+                            <span>Панель</span>
+                        </div>
+                        <div class="app-nav" data-tab="settings">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4"/></svg>
+                            <span>Настройки</span>
+                        </div>
+                        <div class="app-nav" data-tab="logs">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                            <span>Логи</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="app-content">
+                    <!-- Dashboard -->
+                    <div class="app-tab" id="tab-dashboard">
+                        <div class="app-header">
+                            <h3 class="app-h3">Панель управления</h3>
+                            <button class="app-run-btn" id="btn-demo-run">
+                                <svg viewBox="0 0 24 24" fill="currentColor" class="play-icon"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                <svg viewBox="0 0 24 24" fill="currentColor" class="stop-icon" style="display:none"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+                                <span id="run-text">Запустить</span>
+                            </button>
+                        </div>
+                        <div class="app-stats">
+                            <div class="app-stat">
+                                <div class="app-stat-val" id="d-comments">0</div>
+                                <div class="app-stat-lbl">Комментариев</div>
+                            </div>
+                            <div class="app-stat">
+                                <div class="app-stat-val purple" id="d-karma">0</div>
+                                <div class="app-stat-lbl">Кармы</div>
+                            </div>
+                            <div class="app-stat">
+                                <div class="app-stat-val" id="d-uptime">0:00</div>
+                                <div class="app-stat-lbl">Uptime</div>
+                            </div>
+                        </div>
+                        <div class="app-account">
+                            <div class="app-acc-row">
+                                <div class="app-acc-avatar">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                </div>
+                                <div class="app-acc-info">
+                                    <div class="app-acc-name">u/demo_account</div>
+                                    <div class="app-acc-status" id="d-status">Ожидание</div>
+                                </div>
+                                <div class="app-acc-karma" id="d-acc-karma">0 karma</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Settings -->
+                    <div class="app-tab" id="tab-settings" style="display:none">
+                        <h3 class="app-h3" style="margin-bottom:14px">Настройки</h3>
+                        <div class="app-setting">
+                            <div class="app-set-left">
+                                <div class="app-set-name">Сабреддиты</div>
+                                <div class="app-set-desc">Целевые сабреддиты для фарма</div>
+                            </div>
+                            <div class="app-set-val">AskReddit, funny</div>
+                        </div>
+                        <div class="app-setting">
+                            <div class="app-set-left">
+                                <div class="app-set-name">Задержка между действиями</div>
+                                <div class="app-set-desc">Случайная пауза в секундах</div>
+                            </div>
+                            <div class="app-set-val">60 — 180</div>
+                        </div>
+                        <div class="app-setting">
+                            <div class="app-set-left">
+                                <div class="app-set-name">ИИ модель</div>
+                                <div class="app-set-desc">Модель для генерации комментариев</div>
+                            </div>
+                            <div class="app-set-val">Llama 3 70B</div>
+                        </div>
+                        <div class="app-setting">
+                            <div class="app-set-left">
+                                <div class="app-set-name">Прокси</div>
+                                <div class="app-set-desc">Ротация прокси серверов</div>
+                            </div>
+                            <div class="app-toggle on"><div class="app-toggle-dot"></div></div>
+                        </div>
+                        <div class="app-setting">
+                            <div class="app-set-left">
+                                <div class="app-set-name">Прогрев аккаунта</div>
+                                <div class="app-set-desc">4-фазная система прогрева</div>
+                            </div>
+                            <div class="app-toggle on"><div class="app-toggle-dot"></div></div>
+                        </div>
+                    </div>
+
+                    <!-- Logs -->
+                    <div class="app-tab" id="tab-logs" style="display:none">
+                        <h3 class="app-h3" style="margin-bottom:10px">Логи</h3>
+                        <div class="app-logs" id="demo-logs">
+                            <div class="app-log"><span class="al-time">12:00:00</span><span class="al-text">Система готова к запуску</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ Features ═══ -->
+    <section class="section" id="features">
+        <div class="s-head">
+            <div class="s-chip">Возможности</div>
+            <h2 class="s-h">Что внутри</h2>
+        </div>
+        <div class="f-grid">
+            <div class="f-card">
+                <div class="f-ic purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                <div class="f-h">Мульти-аккаунт</div>
+                <div class="f-p">Параллельный фарм с раздельными сессиями</div>
+            </div>
+            <div class="f-card">
+                <div class="f-ic green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+                <div class="f-h">ИИ-комментарии</div>
+                <div class="f-p">Llama 3 70B пишет уникальные ответы</div>
+            </div>
+            <div class="f-card">
+                <div class="f-ic blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                <div class="f-h">Прогрев</div>
+                <div class="f-p">4-фазная система наращивания активности</div>
+            </div>
+            <div class="f-card">
+                <div class="f-ic orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+                <div class="f-h">Стелс-режим</div>
+                <div class="f-p">Stealth, отпечатки, прокси-ротация</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ Pricing ═══ -->
+    <section class="section" id="pricing">
+        <div class="s-head">
+            <div class="s-chip">Тарифы</div>
+            <h2 class="s-h">Выберите план</h2>
+        </div>
+        <div class="p-grid">
+            <div class="p-card">
+                <div class="p-top"><div class="p-name">Starter</div><div class="p-dur">7 дней</div></div>
+                <div class="p-price">$15</div>
+                <ul class="p-list">
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>До 3 аккаунтов</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>ИИ-комментарии</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Прогрев</li>
+                </ul>
+                <button class="btn-plan" data-plan="starter">Выбрать</button>
+            </div>
+            <div class="p-card featured">
+                <div class="p-badge">Популярный</div>
+                <div class="p-top"><div class="p-name">Pro</div><div class="p-dur">30 дней</div></div>
+                <div class="p-price">$39</div>
+                <ul class="p-list">
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>До 10 аккаунтов</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>ИИ-комментарии</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Приоритетная поддержка</li>
+                </ul>
+                <button class="btn-plan-main" data-plan="pro">Выбрать</button>
+            </div>
+            <div class="p-card">
+                <div class="p-top"><div class="p-name">Unlimited</div><div class="p-dur">Навсегда</div></div>
+                <div class="p-price">$99</div>
+                <ul class="p-list">
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Без лимита аккаунтов</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Все обновления навсегда</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Приоритетная поддержка</li>
+                </ul>
+                <button class="btn-plan" data-plan="unlimited">Выбрать</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ FAQ ═══ -->
+    <section class="section" id="faq">
+        <div class="s-head"><div class="s-chip">FAQ</div><h2 class="s-h">Ответы на частые вопросы</h2></div>
+        <div class="faq-list">
+            <div class="faq-item">
+                <div class="faq-q">Нужно ли мне покупать свои прокси?</div>
+                <div class="faq-a"><p>Да, бот поддерживает работу через HTTP и SOCKS5 прокси. Ротация происходит автоматически.</p></div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">Безопасно ли это для аккаунтов?</div>
+                <div class="faq-a"><p>Да, встроен 4-фазный прогрев и эмуляция паттернов поведения реального человека (паузы, скроллинг).</p></div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">Где работает софт?</div>
+                <div class="faq-a"><p>Приложение поддерживается на ОС Windows 10/11 (64-bit). Вы также можете устанавливать его на выделенный сервер/дедик для работы 24/7.</p></div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">Какую ИИ-модель использует бот?</div>
+                <div class="faq-a"><p>Вы можете самостоятельно вставить свой API ключ в настройках (например, Groq или OpenAI). Пользователь сам выбирает лучшую модель для задачи.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ Footer ═══ -->
+    <footer class="footer">
+        <div class="footer-logo">
+            <img src="logo.png" alt="" class="logo-img sm">
+            <span>не даю упасть</span>
+        </div>
+        <div class="footer-links">
+            <a href="#" id="link-support">Поддержка</a>
+            <a href="#" id="link-channel">Канал</a>
+        </div>
+        <div class="footer-copy">© 2026 не даю упасть</div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
