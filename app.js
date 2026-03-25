@@ -42,13 +42,16 @@
                     if (sub.active) {
                         profSub.classList.add('active');
                         profSub.textContent = `Тариф: ${sub.plan || 'Pro'}`;
+                        document.getElementById('tg-prof-action-btn').textContent = 'Продлить';
                     } else {
                         profSub.classList.add('inactive');
                         profSub.textContent = 'Подписка неактивна';
+                        document.getElementById('tg-prof-action-btn').textContent = 'Купить';
                     }
                 } else {
                     profSub.classList.add('inactive');
                     profSub.textContent = 'Нет активной подписки';
+                    document.getElementById('tg-prof-action-btn').textContent = 'Купить';
                 }
             })
             .catch(() => {
