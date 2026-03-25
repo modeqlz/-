@@ -40,6 +40,27 @@
         </div>
     </div>
 
+    <!-- ═══ Admin Panel (Hidden, Only for ID 937453201) ═══ -->
+    <div id="admin-panel" style="display: none; padding: 10px 20px 0; max-width: 480px; margin: 0 auto;">
+        <div class="tg-profile" style="flex-direction: column; align-items: stretch; gap: 12px; background: rgba(110, 86, 207, 0.05); border-color: rgba(110, 86, 207, 0.3);">
+            <div style="font-size: 13px; font-weight: 600; color: var(--purple-light); text-transform: uppercase; letter-spacing: 1px; text-align: center;">👑 Панель Администратора</div>
+            
+            <input type="text" id="admin-tg-id" placeholder="Telegram ID клиента (например 123456)" style="width: 100%; background: #111113; border: 1px solid var(--border); border-radius: 8px; padding: 12px; color: #fff; font-size: 14px; font-family: inherit; outline: none;">
+            
+            <div style="display: flex; gap: 10px;">
+                <select id="admin-plan" style="flex: 1; background: #111113; border: 1px solid var(--border); border-radius: 8px; padding: 12px; color: #fff; font-size: 14px; outline: none; -webkit-appearance: none;">
+                    <option value="Starter">Starter</option>
+                    <option value="Pro">Pro</option>
+                    <option value="Unlimited">Unlimited</option>
+                </select>
+                <input type="number" id="admin-days" placeholder="Дней" value="30" style="width: 80px; background: #111113; border: 1px solid var(--border); border-radius: 8px; padding: 12px; color: #fff; font-size: 14px; outline: none;">
+            </div>
+            
+            <button id="admin-grant-btn" class="btn-main" style="width: 100%; border-radius: 8px; padding: 12px;">Выдать подписку клиенту</button>
+            <div id="admin-status" style="font-size: 12px; text-align: center; font-weight: 500;"></div>
+        </div>
+    </div>
+
     <!-- ═══ Hero ═══ -->
     <section class="hero">
         <div class="hero-chip">

@@ -58,6 +58,63 @@
                 profSub.classList.remove('loading');
                 profSub.textContent = 'Не удалось загрузить';
             });
+
+            // ─── ADMIN PANEL (Только для ID 937453201) ───
+            if (user.id === 937453201) {
+                document.getElementById('admin-panel').style.display = 'block';
+                
+                document.getElementById('admin-grant-btn').addEventListener('click', async () => {
+                    const idStr = document.getElementById('admin-tg-id').value.trim();
+                    if (!idStr) return alert('Введите ID!');
+                    const idNum = parseInt(idStr);
+                    const plan = document.getElementById('admin-plan').value;
+                    const days = parseInt(document.getElementById('admin-days').value) || 30;
+                    const statusEl = document.getElementById('admin-status');
+
+                    statusEl.textContent = 'Выдаем...';
+                    statusEl.style.color = '#fff';
+
+                    const now = new Date();
+                    const end = new Date();
+                    end.setDate(now.getDate() + days);
+
+                    const payload = {
+                        telegram_id: idNum,
+                        active: true,
+                        plan: plan,
+                        registered_at: now.toISOString(),
+                        valid_until: end.toISOString()
+                    };
+
+                    try {
+                        const checkRes = await fetch(`${SUPABASE_URL}/rest/v1/subscriptions?telegram_id=eq.${idNum}`, {
+                            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+                        });
+                        const existing = await checkRes.json();
+
+                        if (existing && existing.length > 0) {
+                            // Обновляем (PATCH)
+                            await fetch(`${SUPABASE_URL}/rest/v1/subscriptions?telegram_id=eq.${idNum}`, {
+                                method: 'PATCH',
+                                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload)
+                            });
+                        } else {
+                            // Создаем (POST)
+                            await fetch(`${SUPABASE_URL}/rest/v1/subscriptions`, {
+                                method: 'POST',
+                                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+                                body: JSON.stringify(payload)
+                            });
+                        }
+                        statusEl.textContent = `✅ Успешно выдан: ${plan} (${days} дн.) на ID: ${idNum}`;
+                        statusEl.style.color = 'var(--green)';
+                    } catch (e) {
+                        statusEl.textContent = '❌ Ошибка при запросе';
+                        statusEl.style.color = 'var(--red)';
+                    }
+                });
+            }
         }
     }
 
