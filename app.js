@@ -61,7 +61,19 @@
 
             // ─── ADMIN PANEL (Только для ID 937453201) ───
             if (user.id === 937453201) {
-                document.getElementById('admin-panel').style.display = 'block';
+                const toggles = document.getElementById('admin-toggles');
+                const panel = document.getElementById('admin-panel');
+                const btnToggle = document.getElementById('btn-toggle-admin');
+
+                toggles.style.display = 'block';
+                
+                btnToggle.addEventListener('click', () => {
+                    if (panel.style.display === 'none') {
+                        panel.style.display = 'block';
+                    } else {
+                        panel.style.display = 'none';
+                    }
+                });
                 
                 document.getElementById('admin-grant-btn').addEventListener('click', async () => {
                     const idStr = document.getElementById('admin-tg-id').value.trim();
@@ -71,7 +83,11 @@
                     const days = parseInt(document.getElementById('admin-days').value) || 30;
                     const statusEl = document.getElementById('admin-status');
 
-                    statusEl.textContent = 'Выдаем...';
+                    const iconLoad = `<svg style="width: 14px; height: 14px; animation: spin 1s linear infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`;
+                    const iconOk = `<svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>`;
+                    const iconErr = `<svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
+
+                    statusEl.innerHTML = `${iconLoad} <span>Выдаем...</span>`;
                     statusEl.style.color = '#fff';
 
                     const now = new Date();
@@ -107,10 +123,10 @@
                                 body: JSON.stringify(payload)
                             });
                         }
-                        statusEl.textContent = `✅ Успешно выдан: ${plan} (${days} дн.) на ID: ${idNum}`;
+                        statusEl.innerHTML = `${iconOk} <span>Успешно: ${plan} (${days} дн.) на ${idNum}</span>`;
                         statusEl.style.color = 'var(--green)';
                     } catch (e) {
-                        statusEl.textContent = '❌ Ошибка при запросе';
+                        statusEl.innerHTML = `${iconErr} <span>Ошибка при запросе</span>`;
                         statusEl.style.color = 'var(--red)';
                     }
                 });

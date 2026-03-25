@@ -40,10 +40,21 @@
         </div>
     </div>
 
-    <!-- ═══ Admin Panel (Hidden, Only for ID 937453201) ═══ -->
-    <div id="admin-panel" style="display: none; padding: 10px 20px 0; max-width: 480px; margin: 0 auto;">
+    <!-- ═══ Admin Panel Toggle (Hidden, Only for ID 937453201) ═══ -->
+    <div id="admin-toggles" style="display: none; padding: 12px 20px 0; max-width: 480px; margin: 0 auto;">
+        <button id="btn-toggle-admin" class="btn-main" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(110,86,207,0.1); border: 1px solid var(--purple); color: var(--purple-light); padding: 10px; border-radius: 12px; font-weight: 600;">
+            <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Управление пользователями
+        </button>
+    </div>
+
+    <!-- ═══ Admin Panel Form ═══ -->
+    <div id="admin-panel" style="display: none; padding: 12px 20px 0; max-width: 480px; margin: 0 auto;">
         <div class="tg-profile" style="flex-direction: column; align-items: stretch; gap: 12px; background: rgba(110, 86, 207, 0.05); border-color: rgba(110, 86, 207, 0.3);">
-            <div style="font-size: 13px; font-weight: 600; color: var(--purple-light); text-transform: uppercase; letter-spacing: 1px; text-align: center;">👑 Панель Администратора</div>
+            <div style="font-size: 13px; font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: 1px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <svg style="width: 14px; height: 14px; color: var(--purple-light)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                Панель Администратора
+            </div>
             
             <input type="text" id="admin-tg-id" placeholder="Telegram ID клиента (например 123456)" style="width: 100%; background: #111113; border: 1px solid var(--border); border-radius: 8px; padding: 12px; color: #fff; font-size: 14px; font-family: inherit; outline: none;">
             
@@ -57,7 +68,7 @@
             </div>
             
             <button id="admin-grant-btn" class="btn-main" style="width: 100%; border-radius: 8px; padding: 12px;">Выдать подписку клиенту</button>
-            <div id="admin-status" style="font-size: 12px; text-align: center; font-weight: 500;"></div>
+            <div id="admin-status" style="font-size: 12px; text-align: center; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 6px;"></div>
         </div>
     </div>
 
