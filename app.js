@@ -98,8 +98,7 @@
                         telegram_id: idNum,
                         active: true,
                         plan: plan,
-                        registered_at: now.toISOString(),
-                        valid_until: end.toISOString()
+                        expires_at: end.toISOString()
                     };
 
                     try {
