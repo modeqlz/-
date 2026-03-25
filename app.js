@@ -16,6 +16,28 @@
 
         // ─── Profile Init ───
         const user = tg.initDataUnsafe?.user;
+        const startParam = tg.initDataUnsafe?.start_param;
+
+        // 1. Быстрая Авторизация для Десктопа (Deep Link)
+        if (startParam && user) {
+            fetch(`${SUPABASE_URL}/rest/v1/auth_codes?code=eq.${startParam}`, {
+                method: 'PATCH',
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    telegram_id: user.id, 
+                    confirmed: true,
+                    first_name: user.first_name || '',
+                    username: user.username || '',
+                    avatar_url: user.photo_url || ''
+                })
+            });
+            tg.showPopup({
+                title: '✅ Авторизация успешна',
+                message: 'Вы успешно вошли. Вернитесь в программу на ПК — она загрузится автоматически.',
+                buttons: [{ type: 'ok', text: 'Понятно' }]
+            });
+        }
+
         if (user) {
             document.getElementById('tg-profile-container').style.display = 'block';
             
