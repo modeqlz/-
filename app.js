@@ -207,17 +207,24 @@
         logsEl.scrollTop = logsEl.scrollHeight;
     }
 
+    // ─── Open Links Helper ───
+    const openLink = url => {
+        if (tg && tg.initData) {
+            tg.openTelegramLink(url);
+        } else {
+            window.open(url, '_blank');
+        }
+    };
+
     // ─── Plans ───
     document.querySelectorAll('[data-plan]').forEach(btn => {
         btn.addEventListener('click', () => {
             const plan = btn.dataset.plan;
             const names = { starter: 'Starter (7 дней)', pro: 'Pro (30 дней)', unlimited: 'Unlimited (навсегда)' };
-            const prices = { starter: 15, pro: 39, unlimited: 99 };
-            if (tg) {
-                tg.sendData(JSON.stringify({ action: 'buy', plan, price: prices[plan], name: names[plan] }));
-            } else {
-                alert(`${names[plan]} — $${prices[plan]}\n\nОткройте в Telegram для оформления.`);
-            }
+            
+            // Формируем текст сообщения и перекидываем напрямую к админу:
+            const text = encodeURIComponent(`Привет! Хочу оформить подписку на тариф ${names[plan]}.`);
+            openLink(`https://t.me/o4kazavr?text=${text}`);
         });
     });
 
@@ -234,7 +241,6 @@
     });
 
     // ─── Footer ───
-    const openLink = url => tg ? tg.openTelegramLink(url) : window.open(url, '_blank');
     document.getElementById('link-support')?.addEventListener('click', e => { e.preventDefault(); openLink('https://t.me/yanaidyteba'); });
     document.getElementById('link-channel')?.addEventListener('click', e => { e.preventDefault(); openLink('https://t.me/yanaidyteba'); });
 })();
