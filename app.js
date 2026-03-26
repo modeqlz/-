@@ -39,47 +39,41 @@
     }
 
     // ═══════════════════════════════════════════════════════════
-    //  PROFILE + AUTH (через API)
+    //  PROFILE + AUTH (Инстант отображение + секурный API)
     // ═══════════════════════════════════════════════════════════
     if (tg && tg.initData) {
         const startParam = tg.initDataUnsafe?.start_param;
 
-        // 1. Deep Link авторизация — через сервер, не напрямую в БД
+        // 1. Deep Link авторизация — через сервер
         if (startParam && /^\d{6}$/.test(startParam)) {
             api('/api/auth-confirm', {
                 method: 'POST',
                 body: JSON.stringify({ code: startParam }),
             })
             .then(() => {
-                tg.showPopup({
-                    title: '✅ Авторизация успешна',
-                    message: 'Вернитесь в приложение на ПК — оно загрузится автоматически.',
-                    buttons: [{ type: 'ok', text: 'Понятно' }],
-                });
+                tg.showPopup({ title: '✅ Успешно', message: 'Авторизация пройдена.', buttons: [{ type: 'ok' }]});
             })
             .catch(err => {
-                tg.showPopup({
-                    title: '❌ Ошибка',
-                    message: err.message || 'Не удалось авторизоваться.',
-                    buttons: [{ type: 'ok', text: 'OK' }],
-                });
+                tg.showPopup({ title: '❌ Ошибка', message: err.message, buttons: [{ type: 'ok' }]});
             });
         }
 
-        // 2. Загружаем профиль через API
+        // 2. ИНСТАНТ ОТОБРАЖЕНИЕ (как было раньше для скорости UI)
+        const container = document.getElementById('tg-profile-container');
+        const profName = document.getElementById('tg-prof-name');
+        const profAvatar = document.getElementById('tg-prof-avatar');
+        const profSub = document.getElementById('tg-prof-sub');
+        
+        container.style.display = 'block'; // Показываем сразу!
+        
+        const safeUser = tg.initDataUnsafe?.user || {};
+        profName.textContent = safeUser.first_name || 'Пользователь';
+        profAvatar.src = safeUser.photo_url || 
+            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%236e56cf" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+
+        // 3. Загружаем подписку через API для безопасности
         api('/api/profile')
             .then(data => {
-                const container = document.getElementById('tg-profile-container');
-                container.style.display = 'block';
-
-                const profName = document.getElementById('tg-prof-name');
-                const profAvatar = document.getElementById('tg-prof-avatar');
-                const profSub = document.getElementById('tg-prof-sub');
-
-                profName.textContent = data.user.first_name || 'Пользователь';
-                profAvatar.src = data.user.photo_url ||
-                    'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%236e56cf" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
-
                 profSub.classList.remove('loading');
                 if (data.subscription && data.subscription.active) {
                     profSub.classList.add('active');
@@ -87,11 +81,11 @@
                     document.getElementById('tg-prof-action-btn').textContent = 'Продлить';
                 } else {
                     profSub.classList.add('inactive');
-                    profSub.textContent = data.subscription ? 'Подписка неактивна' : 'Нет подписки';
+                    profSub.textContent = 'Нет подписки';
                     document.getElementById('tg-prof-action-btn').textContent = 'Купить';
                 }
 
-                // 3. Админ-панель (сервер валидирует isAdmin)
+                // 4. Админ-панель (сервер валидирует isAdmin)
                 if (data.isAdmin) {
                     const toggles = document.getElementById('admin-toggles');
                     const panel = document.getElementById('admin-panel');
