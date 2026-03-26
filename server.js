@@ -319,10 +319,15 @@ app.use((req, res) => {
 });
 
 // ═══════════════════════════════════════════════════════════════
-//  Запуск
+//  Запуск (ВНИМАНИЕ: Vercel использует module.exports)
 // ═══════════════════════════════════════════════════════════════
-app.listen(PORT, () => {
-    console.log(`🌐 Mini App API сервер запущен на порту ${PORT}`);
-    console.log(`   Admin ID: ${ADMIN_ID}`);
-    console.log(`   Supabase: ${SUPABASE_URL}`);
-});
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+    app.listen(PORT, () => {
+        console.log(`🌐 Mini App API сервер запущен на порту ${PORT}`);
+        console.log(`   Admin ID: ${ADMIN_ID}`);
+        console.log(`   Supabase: ${SUPABASE_URL}`);
+    });
+}
+
+// Экспорт для Vercel Serverless Functions
+module.exports = app;
