@@ -1,13 +1,15 @@
 {
     "name": "reddit-bot-shop",
-    "version": "1.0.0",
-    "description": "Telegram Bot + Mini App для продажи Reddit Karma Bot",
-    "main": "bot.js",
+    "version": "2.0.0",
+    "description": "Telegram Bot + Mini App API Server",
+    "main": "server.js",
     "scripts": {
-        "start": "node bot.js",
-        "dev": "node --watch bot.js"
+        "start": "node server.js",
+        "dev": "node --watch server.js",
+        "bot": "python bot.py"
     },
     "dependencies": {
-        "telegraf": "^4.16.0"
+        "dotenv": "^16.4.0",
+        "express": "^4.21.0"
     }
 }

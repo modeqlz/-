@@ -1,161 +1,150 @@
 // ═══════════════════════════════════════════════════════════════
-//  Reddit Karma Bot — Mini App
+//  Reddit Karma Bot — Mini App (БЕЗОПАСНАЯ ВЕРСИЯ)
+//  Все запросы идут через API сервер, НЕТ прямого доступа к БД
 // ═══════════════════════════════════════════════════════════════
 
 (() => {
-    // ─── Supabase Config ───
-    const SUPABASE_URL = "https://xabcwmhmbxhcopoynbyw.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhhYmN3bWhtYnhoY29wb3luYnl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODcxOTUsImV4cCI6MjA4OTk2MzE5NX0.m9xCYtWBlObqLVADUhbNlw-DHnUGHc76vsjRmP6Xgr4";
-
     const tg = window.Telegram?.WebApp;
     if (tg) {
         tg.ready();
         tg.expand();
         tg.setHeaderColor('#0a0a0b');
         tg.setBackgroundColor('#0a0a0b');
-
-        // ─── Profile Init ───
-        const user = tg.initDataUnsafe?.user;
-        const startParam = tg.initDataUnsafe?.start_param;
-
-        // 1. Быстрая Авторизация для Десктопа (Deep Link)
-        if (startParam && user) {
-            fetch(`${SUPABASE_URL}/rest/v1/auth_codes?code=eq.${startParam}`, {
-                method: 'PATCH',
-                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    telegram_id: user.id, 
-                    confirmed: true,
-                    first_name: user.first_name || '',
-                    username: user.username || '',
-                    avatar_url: user.photo_url || ''
-                })
-            });
-            tg.showPopup({
-                title: '✅ Авторизация успешна',
-                message: 'Вы успешно вошли. Вернитесь в программу на ПК — она загрузится автоматически.',
-                buttons: [{ type: 'ok', text: 'Понятно' }]
-            });
-        }
-
-        if (user) {
-            document.getElementById('tg-profile-container').style.display = 'block';
-            
-            const profName = document.getElementById('tg-prof-name');
-            const profAvatar = document.getElementById('tg-prof-avatar');
-            const profSub = document.getElementById('tg-prof-sub');
-            
-            profName.textContent = user.first_name || 'Пользователь';
-            // Аватарка из Телеграм (если доступна photo_url)
-            profAvatar.src = user.photo_url || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%236e56cf" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
-
-            // Запрашиваем из Supabase
-            fetch(`${SUPABASE_URL}/rest/v1/subscriptions?telegram_id=eq.${user.id}&select=*`, {
-                headers: {
-                    'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${SUPABASE_KEY}`
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
-                profSub.classList.remove('loading');
-                if (data && data.length > 0) {
-                    const sub = data[0];
-                    if (sub.active) {
-                        profSub.classList.add('active');
-                        profSub.textContent = `Тариф: ${sub.plan || 'Pro'}`;
-                        document.getElementById('tg-prof-action-btn').textContent = 'Продлить';
-                    } else {
-                        profSub.classList.add('inactive');
-                        profSub.textContent = 'Подписка неактивна';
-                        document.getElementById('tg-prof-action-btn').textContent = 'Купить';
-                    }
-                } else {
-                    profSub.classList.add('inactive');
-                    profSub.textContent = 'Нет активной подписки';
-                    document.getElementById('tg-prof-action-btn').textContent = 'Купить';
-                }
-            })
-            .catch(() => {
-                profSub.classList.remove('loading');
-                profSub.textContent = 'Не удалось загрузить';
-            });
-
-            // ─── ADMIN PANEL (Только для ID 937453201) ───
-            if (user.id === 937453201) {
-                const toggles = document.getElementById('admin-toggles');
-                const panel = document.getElementById('admin-panel');
-                const btnToggle = document.getElementById('btn-toggle-admin');
-
-                toggles.style.display = 'block';
-                
-                btnToggle.addEventListener('click', () => {
-                    if (panel.style.display === 'none') {
-                        panel.style.display = 'block';
-                    } else {
-                        panel.style.display = 'none';
-                    }
-                });
-                
-                document.getElementById('admin-grant-btn').addEventListener('click', async () => {
-                    const idStr = document.getElementById('admin-tg-id').value.trim();
-                    if (!idStr) return alert('Введите ID!');
-                    const idNum = parseInt(idStr);
-                    const plan = document.getElementById('admin-plan').value;
-                    const days = parseInt(document.getElementById('admin-days').value) || 30;
-                    const statusEl = document.getElementById('admin-status');
-
-                    const iconLoad = `<svg style="width: 14px; height: 14px; animation: spin 1s linear infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`;
-                    const iconOk = `<svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>`;
-                    const iconErr = `<svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
-
-                    statusEl.innerHTML = `${iconLoad} <span>Выдаем...</span>`;
-                    statusEl.style.color = '#fff';
-
-                    const now = new Date();
-                    const end = new Date();
-                    end.setDate(now.getDate() + days);
-
-                    const payload = {
-                        telegram_id: idNum,
-                        active: true,
-                        plan: plan,
-                        expires_at: end.toISOString()
-                    };
-
-                    try {
-                        const checkRes = await fetch(`${SUPABASE_URL}/rest/v1/subscriptions?telegram_id=eq.${idNum}`, {
-                            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-                        });
-                        const existing = await checkRes.json();
-
-                        if (existing && existing.length > 0) {
-                            // Обновляем (PATCH)
-                            await fetch(`${SUPABASE_URL}/rest/v1/subscriptions?telegram_id=eq.${idNum}`, {
-                                method: 'PATCH',
-                                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
-                                body: JSON.stringify(payload)
-                            });
-                        } else {
-                            // Создаем (POST)
-                            await fetch(`${SUPABASE_URL}/rest/v1/subscriptions`, {
-                                method: 'POST',
-                                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-                                body: JSON.stringify(payload)
-                            });
-                        }
-                        statusEl.innerHTML = `${iconOk} <span>Успешно: ${plan} (${days} дн.) на ${idNum}</span>`;
-                        statusEl.style.color = 'var(--green)';
-                    } catch (e) {
-                        statusEl.innerHTML = `${iconErr} <span>Ошибка при запросе</span>`;
-                        statusEl.style.color = 'var(--red)';
-                    }
-                });
-            }
-        }
     }
 
-    // ─── Scroll Reveal ───
+    // ─── API Helper (все запросы через сервер с валидацией initData) ───
+    function getInitData() {
+        return tg?.initData || '';
+    }
+
+    async function api(endpoint, options = {}) {
+        const initData = getInitData();
+        if (!initData) throw new Error('No initData');
+
+        const res = await fetch(endpoint, {
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Telegram-Init-Data': initData,
+                ...options.headers,
+            },
+        });
+
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({ error: res.statusText }));
+            throw new Error(err.error || 'Server error');
+        }
+
+        return res.json();
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  PROFILE + AUTH (через API)
+    // ═══════════════════════════════════════════════════════════
+    if (tg && tg.initData) {
+        const startParam = tg.initDataUnsafe?.start_param;
+
+        // 1. Deep Link авторизация — через сервер, не напрямую в БД
+        if (startParam && /^\d{6}$/.test(startParam)) {
+            api('/api/auth-confirm', {
+                method: 'POST',
+                body: JSON.stringify({ code: startParam }),
+            })
+            .then(() => {
+                tg.showPopup({
+                    title: '✅ Авторизация успешна',
+                    message: 'Вернитесь в приложение на ПК — оно загрузится автоматически.',
+                    buttons: [{ type: 'ok', text: 'Понятно' }],
+                });
+            })
+            .catch(err => {
+                tg.showPopup({
+                    title: '❌ Ошибка',
+                    message: err.message || 'Не удалось авторизоваться.',
+                    buttons: [{ type: 'ok', text: 'OK' }],
+                });
+            });
+        }
+
+        // 2. Загружаем профиль через API
+        api('/api/profile')
+            .then(data => {
+                const container = document.getElementById('tg-profile-container');
+                container.style.display = 'block';
+
+                const profName = document.getElementById('tg-prof-name');
+                const profAvatar = document.getElementById('tg-prof-avatar');
+                const profSub = document.getElementById('tg-prof-sub');
+
+                profName.textContent = data.user.first_name || 'Пользователь';
+                profAvatar.src = data.user.photo_url ||
+                    'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%236e56cf" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+
+                profSub.classList.remove('loading');
+                if (data.subscription && data.subscription.active) {
+                    profSub.classList.add('active');
+                    profSub.textContent = `Тариф: ${data.subscription.plan || 'Pro'}`;
+                    document.getElementById('tg-prof-action-btn').textContent = 'Продлить';
+                } else {
+                    profSub.classList.add('inactive');
+                    profSub.textContent = data.subscription ? 'Подписка неактивна' : 'Нет подписки';
+                    document.getElementById('tg-prof-action-btn').textContent = 'Купить';
+                }
+
+                // 3. Админ-панель (сервер валидирует isAdmin)
+                if (data.isAdmin) {
+                    const toggles = document.getElementById('admin-toggles');
+                    const panel = document.getElementById('admin-panel');
+                    const btnToggle = document.getElementById('btn-toggle-admin');
+
+                    toggles.style.display = 'block';
+
+                    btnToggle.addEventListener('click', () => {
+                        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+                    });
+
+                    document.getElementById('admin-grant-btn').addEventListener('click', async () => {
+                        const idStr = document.getElementById('admin-tg-id').value.trim();
+                        if (!idStr) return alert('Введите ID!');
+
+                        const plan = document.getElementById('admin-plan').value;
+                        const days = parseInt(document.getElementById('admin-days').value) || 30;
+                        const statusEl = document.getElementById('admin-status');
+
+                        const iconLoad = `<svg style="width:14px;height:14px;animation:spin 1s linear infinite" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`;
+                        const iconOk = `<svg style="width:14px;height:14px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>`;
+                        const iconErr = `<svg style="width:14px;height:14px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
+
+                        statusEl.innerHTML = `${iconLoad} <span>Выдаём...</span>`;
+                        statusEl.style.color = '#fff';
+
+                        try {
+                            // Запрос идёт через API, сервер проверяет что ты РЕАЛЬНО админ
+                            const result = await api('/api/admin/grant', {
+                                method: 'POST',
+                                body: JSON.stringify({ telegramId: idStr, plan, days }),
+                            });
+                            statusEl.innerHTML = `${iconOk} <span>Успешно: ${result.plan} (${result.days} дн.) → ${result.telegramId}</span>`;
+                            statusEl.style.color = 'var(--green)';
+                        } catch (e) {
+                            statusEl.innerHTML = `${iconErr} <span>${e.message || 'Ошибка'}</span>`;
+                            statusEl.style.color = 'var(--red)';
+                        }
+                    });
+                }
+            })
+            .catch(err => {
+                const profSub = document.getElementById('tg-prof-sub');
+                if (profSub) {
+                    profSub.classList.remove('loading');
+                    profSub.textContent = 'Не удалось загрузить';
+                }
+            });
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  SCROLL REVEAL
+    // ═══════════════════════════════════════════════════════════
     const io = new IntersectionObserver((entries) => {
         entries.forEach(e => {
             if (e.isIntersecting) {
@@ -183,7 +172,7 @@
     //  INTERACTIVE APP DEMO
     // ═══════════════════════════════════════════════════════════
 
-    // ─── Tab switching ───
+    // Tab switching
     document.querySelectorAll('.app-nav').forEach(nav => {
         nav.addEventListener('click', () => {
             document.querySelectorAll('.app-nav').forEach(n => n.classList.remove('active'));
@@ -194,12 +183,12 @@
         });
     });
 
-    // ─── Toggle switches ───
+    // Toggle switches
     document.querySelectorAll('.app-toggle').forEach(toggle => {
         toggle.addEventListener('click', () => toggle.classList.toggle('on'));
     });
 
-    // ─── Demo Bot Simulation ───
+    // Demo Bot Simulation
     let running = false;
     let interval = null;
     let seconds = 0;
@@ -225,13 +214,7 @@
     ];
 
     if (btn) {
-        btn.addEventListener('click', () => {
-            if (running) {
-                stopDemo();
-            } else {
-                startDemo();
-            }
-        });
+        btn.addEventListener('click', () => running ? stopDemo() : startDemo());
     }
 
     function startDemo() {
@@ -251,26 +234,19 @@
             const s = seconds % 60;
             elUptime.textContent = `${m}:${s.toString().padStart(2, '0')}`;
 
-            if (seconds === 3) {
-                addLog('Прогрев завершён', 'success');
-            }
+            if (seconds === 3) addLog('Прогрев завершён', 'success');
 
             if (seconds > 3 && seconds % 4 === 0) {
                 const sub = subs[Math.floor(Math.random() * subs.length)];
                 const k = Math.floor(Math.random() * 20) + 1;
                 comments++;
                 karma += k;
-
                 elComments.textContent = comments;
                 elKarma.textContent = '+' + karma;
                 elAccKarma.textContent = karma + ' karma';
-
                 const action = actions[Math.floor(Math.random() * actions.length)];
                 addLog(action.text, action.type);
-
-                setTimeout(() => {
-                    addLog(`Комментарий в ${sub} (+${k} karma)`, 'success');
-                }, 800);
+                setTimeout(() => addLog(`Комментарий в ${sub} (+${k} karma)`, 'success'), 800);
             }
 
             if (seconds > 3 && seconds % 7 === 0) {
@@ -304,7 +280,7 @@
         logsEl.scrollTop = logsEl.scrollHeight;
     }
 
-    // ─── Open Links Helper ───
+    // ─── Links ───
     const openLink = url => {
         if (tg && tg.initData) {
             tg.openTelegramLink(url);
@@ -318,8 +294,6 @@
         btn.addEventListener('click', () => {
             const plan = btn.dataset.plan;
             const names = { starter: 'Starter (7 дней)', pro: 'Pro (30 дней)', unlimited: 'Unlimited (навсегда)' };
-            
-            // Формируем текст сообщения и перекидываем напрямую к админу:
             const text = encodeURIComponent(`Привет! Хочу оформить подписку на тариф ${names[plan]}.`);
             openLink(`https://t.me/o4kazavr?text=${text}`);
         });
@@ -331,13 +305,11 @@
             const item = q.parentElement;
             const isOpen = item.classList.contains('open');
             document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
-            if (!isOpen) {
-                item.classList.add('open');
-            }
+            if (!isOpen) item.classList.add('open');
         });
     });
 
-    // ─── Footer ───
+    // ─── Footer Links ───
     document.getElementById('link-support')?.addEventListener('click', e => { e.preventDefault(); openLink('https://t.me/yanaidyteba'); });
     document.getElementById('link-channel')?.addEventListener('click', e => { e.preventDefault(); openLink('https://t.me/yanaidyteba'); });
 })();
