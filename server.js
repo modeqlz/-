@@ -142,7 +142,104 @@ function requireAuth(req, res, next) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  API ENDPOINTS
+//  API ENDPOINTS (ДЛЯ ДЕСКТОПНОГО ПРИЛОЖЕНИЯ)
+// ═══════════════════════════════════════════════════════════════
+
+// ─── POST /api/desktop/auth/generate ───
+app.post('/api/desktop/auth/generate', async (req, res) => {
+    try {
+        const { device_info } = req.body || {};
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
+        
+        await supabase('auth_codes', {
+            method: 'POST',
+            body: JSON.stringify({ code, device_info })
+        });
+        
+        res.json({ code, botUsername: 'yanedamupastbot' });
+    } catch (err) {
+        console.error('Desktop auth generate error:', err.message);
+        res.status(500).json({ error: 'Ошибка генерации кода' });
+    }
+});
+
+// ─── GET /api/desktop/auth/check ───
+app.get('/api/desktop/auth/check', async (req, res) => {
+    try {
+        const code = req.query.code;
+        if (!code) return res.status(400).json({ error: 'Missing code' });
+
+        const rows = await supabase(`auth_codes?code=eq.${code}&select=*`);
+        if (!rows || rows.length === 0) return res.json({ confirmed: false });
+        
+        const authCode = rows[0];
+        if (!authCode.confirmed || !authCode.telegram_id) {
+            return res.json({ confirmed: false });
+        }
+
+        const profile = {
+            firstName: authCode.first_name || '',
+            username: authCode.username || '',
+            avatarUrl: authCode.avatar_url || ''
+        };
+
+        const subRows = await supabase(`subscriptions?telegram_id=eq.${authCode.telegram_id}&select=*`);
+        if (!subRows || subRows.length === 0) {
+            return res.json({ confirmed: true, hasSubscription: false, telegramId: authCode.telegram_id, ...profile, error: 'Подписка не найдена' });
+        }
+
+        const sub = subRows[0];
+        if (!sub.active) return res.json({ confirmed: true, hasSubscription: false, telegramId: authCode.telegram_id, ...profile, error: 'Подписка деактивирована' });
+        if (sub.expires_at && new Date(sub.expires_at) < new Date()) {
+            return res.json({ confirmed: true, hasSubscription: false, telegramId: authCode.telegram_id, ...profile, error: 'Подписка истекла' });
+        }
+
+        res.json({
+            confirmed: true,
+            hasSubscription: true,
+            telegramId: authCode.telegram_id,
+            ...profile,
+            plan: sub.plan,
+            expiresAt: sub.expires_at
+        });
+    } catch (err) {
+        console.error('Desktop auth check error:', err.message);
+        res.status(500).json({ error: 'Ошибка проверки' });
+    }
+});
+
+// ─── POST /api/desktop/license/check ───
+app.post('/api/desktop/license/check', async (req, res) => {
+    try {
+        const { key, hwid, device_info } = req.body;
+        if (!key) return res.status(400).json({ error: 'Missing key' });
+
+        const normalizedKey = key.trim().toUpperCase();
+        const rows = await supabase(`licenses?key=eq.${encodeURIComponent(normalizedKey)}&select=*`);
+
+        if (!rows || rows.length === 0) return res.json({ valid: false, error: 'Ключ не найден' });
+        
+        const license = rows[0];
+        if (license.active === false) return res.json({ valid: false, error: 'Ключ деактивирован' });
+        if (license.expires_at && new Date(license.expires_at) < new Date()) return res.json({ valid: false, error: 'Срок действия истёк' });
+        if (license.hwid && license.hwid !== '' && license.hwid !== hwid) return res.json({ valid: false, error: 'Ключ привязан к другому ПК' });
+
+        if (!license.hwid || license.hwid === '') {
+            await supabase(`licenses?key=eq.${encodeURIComponent(normalizedKey)}`, {
+                method: 'PATCH',
+                body: JSON.stringify({ hwid, activated_at: new Date().toISOString(), device_info })
+            });
+        }
+
+        res.json({ valid: true });
+    } catch (err) {
+        console.error('Desktop license check error:', err.message);
+        res.status(500).json({ error: 'Ошибка проверки лицензии' });
+    }
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  API ENDPOINTS (ДЛЯ MINI APP)
 // ═══════════════════════════════════════════════════════════════
 
 // ─── GET /api/profile ───
